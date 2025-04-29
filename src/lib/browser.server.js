@@ -2,7 +2,12 @@ import { env } from '$env/dynamic/private';
 import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer-core';
 
+let globalBrowser;
+
 async function getBrowser() {
+	if (globalBrowser) {
+		return globalBrowser;
+	}
 	const isLocal = env.IS_LOCAL === '1';
 
 	const args = [
@@ -17,7 +22,8 @@ async function getBrowser() {
 				`https://github.com/Sparticuz/chromium/releases/download/v130.0.0/chromium-v130.0.0-pack.tar`
 			);
 	console.log('executablePath :>> ', executablePath);
-	return puppeteer.launch({
+	console.time('launching browser');
+	globalBrowser = await puppeteer.launch({
 		args,
 		defaultViewport,
 		executablePath,
@@ -26,6 +32,8 @@ async function getBrowser() {
 		protocolTimeout: 1000 * 60,
 		timeout: 1000 * 60
 	});
+	console.timeEnd('launching browser');
+	return globalBrowser;
 }
 
 /**
@@ -38,10 +46,14 @@ async function getBrowser() {
 export async function getScreenshot(url, selector = 'body', width = 810, height = 1080) {
 	const viewport = { width, height, deviceScaleFactor: 2 };
 	const browser = await getBrowser();
+	console.log('Screenshotting', url, selector, { width, height });
+	console.time('Screenshotting');
 	const page = await browser.newPage();
 	await page.setViewport(viewport);
 	await page.goto(url, { waitUntil: 'networkidle0' });
 	const el = await page.waitForSelector(selector);
 	const file = await el?.screenshot();
+	console.timeEnd('Screenshotting');
+	page.close();
 	return file;
 }
