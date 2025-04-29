@@ -1,5 +1,5 @@
 import { getScreenshot } from '$lib/browser.server.js';
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 
 export const config = {
 	maxDuration: 60
@@ -13,6 +13,9 @@ export let GET = async ({ url }) => {
 
 	if (!target) {
 		return error(404, 'URL must be provided.');
+	}
+	if (target === 'test') {
+		return json({ status: 'ok' });
 	}
 
 	const screenshot = await getScreenshot(target, selector, width, height);
