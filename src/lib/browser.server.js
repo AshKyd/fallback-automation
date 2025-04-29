@@ -45,13 +45,13 @@ export async function getScreenshot(url, selector = 'body', width = 810, height 
 	const viewport = { width, height, deviceScaleFactor: 2 };
 	const browser = await getBrowser();
 	console.log('Screenshotting', url, selector, { width, height });
-	console.time('Screenshotting ' + url);
+	const startTime = Date.now();
 	const page = await browser.newPage();
 	await page.setViewport(viewport);
 	await page.goto(url, { waitUntil: 'networkidle0' });
 	const el = await page.waitForSelector(selector);
 	const file = await el?.screenshot();
-	console.timeEnd('Screenshotting ' + url);
+	console.log('Screenshotting', url, Math.round(Date.now() - startTime) + 's');
 	page.close();
 	return file;
 }
