@@ -51,7 +51,7 @@ export async function getScreenshot(url, selector = 'body', width = 810, height 
 	await page.goto(url, { waitUntil: 'networkidle0' });
 	const el = await page.waitForSelector(selector);
 	const file = await el?.screenshot();
-	console.log('Screenshotting', url, Math.round(Date.now() - startTime) + 's');
+	console.log('Screenshotting', url, Math.round((Date.now() - startTime) / 1000) + 's');
 	page.close();
 	return file;
 }
