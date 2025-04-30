@@ -24,7 +24,7 @@ async function getBrowser() {
 			);
 	globalBrowser = executablePath.then((executablePath) => {
 		console.log('executablePath :>> ', executablePath);
-		puppeteer.launch({
+		return puppeteer.launch({
 			args,
 			defaultViewport,
 			executablePath,
