@@ -16,20 +16,23 @@ async function getBrowser() {
 		'--disable-web-security'
 	];
 	const defaultViewport = chromium.defaultViewport;
+	console.log('Local browser', env.BROWSER_PATH || 'not set');
 	const executablePath = isLocal
-		? env.BROWSER_PATH
-		: await chromium.executablePath(
+		? Promise.resolve(env.BROWSER_PATH)
+		: chromium.executablePath(
 				`https://github.com/Sparticuz/chromium/releases/download/v130.0.0/chromium-v130.0.0-pack.tar`
 			);
-	console.log('executablePath :>> ', executablePath);
-	globalBrowser = puppeteer.launch({
-		args,
-		defaultViewport,
-		executablePath,
-		headless: isLocal ? false : chromium.headless,
-		// ignoreHTTPSErrors: true,
-		protocolTimeout: 1000 * 60,
-		timeout: 1000 * 60
+	globalBrowser = executablePath.then((executablePath) => {
+		console.log('executablePath :>> ', executablePath);
+		puppeteer.launch({
+			args,
+			defaultViewport,
+			executablePath,
+			headless: isLocal ? false : chromium.headless,
+			// ignoreHTTPSErrors: true,
+			protocolTimeout: 1000 * 60,
+			timeout: 1000 * 60
+		});
 	});
 	return globalBrowser;
 }
